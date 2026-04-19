@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: sofan-chatbot-laboral
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GOOGLE_CREDENTIALS_JSON
+        sync: false
+      - key: SHEET_NAME
+        value: Base de Datos - Chatbot Laboral SOFAN 2026
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+    healthCheckPath: /health
+    autoDeploy: true
