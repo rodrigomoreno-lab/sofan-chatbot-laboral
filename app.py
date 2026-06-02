@@ -1,6 +1,6 @@
 """
 SOFAN Chatbot Laboral Inclusivo v3.0
-Arquitectura: Meta WhatsApp Cloud API â FastAPI â Claude AI + Tools â Google Sheets
+Arquitectura: Meta WhatsApp Cloud API > FastAPI > Claude AI + Tools > Google Sheets
 FundaciÃ³n SOFAN Â· Plataforma Laboral Ãuble Â· 2026
 """
 
@@ -25,9 +25,9 @@ META_VERIFY_TOKEN = os.getenv("META_VERIFY_TOKEN", "sofan2026")
 # ââ Formateo WhatsApp ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 def limpiar_markdown(texto: str) -> str:
     """Convierte Markdown a formato limpio para WhatsApp."""
-    # Eliminar negrita que corta palabras: **S**ituaciÃ³n â SituaciÃ³n
+    # Eliminar negrita que corta palabras: **S**ituaciÃ³n = Situacion
     texto = re.sub(r'\*\*([A-Za-zÃ-Ã¿])\*\*([A-Za-zÃ-Ã¿])', r'\1\2', texto)
-    # **texto** â *texto* (negrita WhatsApp)
+    # **texto** -> *texto* (negrita WhatsApp)
     texto = re.sub(r'\*\*(.+?)\*\*', r'*\1*', texto)
     # Eliminar # encabezados
     texto = re.sub(r'^#{1,6}\s+', '', texto, flags=re.MULTILINE)
@@ -276,23 +276,42 @@ async def recibir_mensaje(request: Request):
         if tipo == "text":
             texto = msg.get("text", {}).get("body", "")
         elif tipo == "audio":
-            media_id = msg.get("audio", {×ÒÙ]
-YB[
-ÐUQS×HÝ[YÛßNYYXWÚY^ÛYYXWÚYHB]ØZ][X\ÝÚ]Ø\
-[YÛËXÚX°ëHH]Y[È<'ã¦{î#ÈÜZÜHÛÛÈØÙ\ÛÈ^Ë°¯ÔYY\È\ØÜX\YHHY[ØZOÈH\ÜÛÈH[YYX]ËB]\ÈÝ]\ÈÚÈB[Y\ÈOH[\XÝ]H^ÈH
-\ÙËÙ]
-[\XÝ]HßJBÙ]
-]ÛÜ\HßJKÙ]
-]HJB[ÙN]ØZ][X\ÝÚ]Ø\
-[YÛËXÚX°ëHHY[ØZKÜZÜHÛÛÈØÙ\ÛÈ^Ë°¯ÔYY\È\ØÜX\YHÈ]YHXÙ\Ú]\ÏÈB]\ÈÝ]\ÈÚÈBYÝ^Î]\ÈÝ]\ÈÚÈB[
-ÓTÑ×HÝ[YÛßNÝ^ÖÎ_HB\ÜY\ÝHHØ[\Ü\ÜY\ÝWØÛ]YJ[YÛË^ÊB]ØZ][X\ÝÚ]Ø\
-[YÛË\ÜY\ÝJB^Ù\^Ù\[Û\ÈN[
-ÑTÔHÙ_HB]\ÈÝ]\ÈÚÈB\Ù]
-ÚX[B\Þ[ÈYX[
+            media_id = msg.get("audio", {}).get("id", "")
+            print(f"[AUDIO] {telefono}: media_id={media_id}")
+            await enviar_whatsapp(telefono,
+                "RecibÃ­ tu audio ðï¸ Por ahora solo proceso texto.\n"
+                "Â¿Puedes escribirme tu mensaje? Te respondo de inmediato.")
+            return {"status": "ok"}
+        elif tipo == "interactive":
+            texto = (msg.get("interactive", {})
+                     .get("button_reply", {}).get("title", ""))
+        else:
+            await enviar_whatsapp(telefono,
+                "RecibÃ­ tu mensaje. Por ahora solo proceso texto.\n"
+                "Â¿Puedes escribirme lo que necesitas?")
+            return {"status": "ok"}
 
-N]\ÈÝ]\ÈÚÈÙ\XÙHÓÑSÚ]ÝXÜ[È\ÝX\[Ü×ØXÝ]ÜÈ[ÛÛ\ØXÚ[Û\Ê_B\Ù]
-ÈB\Þ[ÈYÛÝ
+        if not texto:
+            return {"status": "ok"}
 
-N]\ÈY[ØZHÓÑSÚ]ÝXÜ[ÈHY]HÛÝYTHX[ÚX[BY×Û[YW×ÈOH×ÛXZ[×È[\Ü]XÛÜ]XÛÜ[\\ÜÝHÜZ[
-ÜËÙ][Ô
-JJB
+        print(f"[MSG] {telefono}: {texto[:80]}")
+        respuesta = obtener_respuesta_claude(telefono, texto)
+        await enviar_whatsapp(telefono, respuesta)
+
+    except Exception as e:
+        print(f"[ERROR] {e}")
+
+    return {"status": "ok"}
+
+@app.get("/health")
+async def health():
+    return {"status": "ok", "service": "SOFAN Chatbot Laboral v3",
+            "usuarios_activos": len(conversaciones)}
+
+@app.get("/")
+async def root():
+    return {"mensaje": "SOFAN Chatbot Laboral v3 - Meta Cloud API", "health": "/health"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("app:app", host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
