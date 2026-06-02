@@ -1,7 +1,7 @@
 """
 SOFAN Chatbot Laboral Inclusivo v3.0
 Arquitectura: Meta WhatsApp Cloud API > FastAPI > Claude AI + Tools > Google Sheets
-FundaciÃ³n SOFAN Â· Plataforma Laboral Ãuble Â· 2026
+FundaciÃÂ³n SOFAN ÃÂ· Plataforma Laboral ÃÂuble ÃÂ· 2026
 """
 
 import os, json, httpx, re
@@ -22,22 +22,22 @@ conversaciones: dict[str, list] = {}
 META_PHONE_ID = os.getenv("META_PHONE_NUMBER_ID")
 META_VERIFY_TOKEN = os.getenv("META_VERIFY_TOKEN", "sofan2026")
 
-# ââ Formateo WhatsApp ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# Ã¢ÂÂÃ¢ÂÂ Formateo WhatsApp Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 def limpiar_markdown(texto: str) -> str:
     """Convierte Markdown a formato limpio para WhatsApp."""
-    # Eliminar negrita que corta palabras: **S**ituaciÃ³n = Situacion
-    texto = re.sub(r'\*\*([A-Za-zÃ-Ã¿])\*\*([A-Za-zÃ-Ã¿])', r'\1\2', texto)
+    # Eliminar negrita que corta palabras: **S**ituaciÃÂ³n = Situacion
+    texto = re.sub(r'\*\*([A-Za-zÃÂ-ÃÂ¿])\*\*([A-Za-zÃÂ-ÃÂ¿])', r'\1\2', texto)
     # **texto** -> *texto* (negrita WhatsApp)
     texto = re.sub(r'\*\*(.+?)\*\*', r'*\1*', texto)
     # Eliminar # encabezados
     texto = re.sub(r'^#{1,6}\s+', '', texto, flags=re.MULTILINE)
-    # Eliminar lÃ­neas horizontales ---
+    # Eliminar lÃÂ­neas horizontales ---
     texto = re.sub(r'^[-*_]{3,}$', '', texto, flags=re.MULTILINE)
-    # Limpiar lÃ­neas en blanco mÃºltiples
+    # Limpiar lÃÂ­neas en blanco mÃÂºltiples
     texto = re.sub(r'\n{3,}', '\n\n', texto)
     return texto.strip()
 
-# ââ Google Sheets ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# Ã¢ÂÂÃ¢ÂÂ Google Sheets Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 def get_sheets():
     creds_json = json.loads(os.getenv("GOOGLE_CREDENTIALS_JSON", "{}"))
     creds = Credentials.from_service_account_info(
@@ -45,11 +45,11 @@ def get_sheets():
     gc = gspread.authorize(creds)
     return gc.open(os.getenv("SHEET_NAME", "Base de Datos - Chatbot Laboral SOFAN 2026"))
 
-# ââ Herramientas MCP âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# Ã¢ÂÂÃ¢ÂÂ Herramientas MCP Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 TOOLS = [
     {
         "name": "guardar_perfil_usuario",
-        "description": "Guarda o actualiza el perfil laboral del usuario en Google Sheets. Ãsala cuando hayas recopilado nombre y al menos 2 datos mÃ¡s.",
+        "description": "Guarda o actualiza el perfil laboral del usuario en Google Sheets. ÃÂsala cuando hayas recopilado nombre y al menos 2 datos mÃÂ¡s.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -72,7 +72,7 @@ TOOLS = [
     },
     {
         "name": "obtener_perfil_usuario",
-        "description": "Busca si el usuario ya tiene un perfil guardado. Ãsala al inicio de cada conversaciÃ³n.",
+        "description": "Busca si el usuario ya tiene un perfil guardado. ÃÂsala al inicio de cada conversaciÃÂ³n.",
         "input_schema": {
             "type": "object",
             "properties": {"telefono": {"type": "string"}},
@@ -137,181 +137,92 @@ def ejecutar_herramienta(nombre: str, params: dict) -> dict:
         return {"error": str(e)}
     return {"error": "herramienta no reconocida"}
 
-SYSTEM_PROMPT = """Eres el orientador/a laboral virtual de la Plataforma Laboral Inclusiva de FundaciÃ³n SOFAN (Ãuble, Chile).
-Tu misiÃ³n es acompaÃ±ar a personas con discapacidad en su bÃºsqueda de empleo digno.
-Responde SIEMPRE en espaÃ±ol. Frases cortas. Lenguaje cÃ¡lido, inclusivo y NO asistencialista.
+SYSTEM_PROMPT = """Eres el orientador/a laboral virtual de la Plataforma Laboral Inclusiva de FundaciÃÂ³n SOFAN (ÃÂuble, Chile).
+Tu misiÃÂ³n es acompaÃÂ±ar a personas con discapacidad en su bÃÂºsqueda de empleo digno.
+Responde SIEMPRE en espaÃÂ±ol. Frases cortas. Lenguaje cÃÂ¡lido, inclusivo y NO asistencialista.
 
 FORMATO OBLIGATORIO - MUY IMPORTANTE:
-- USA TEXTO PLANO. NUNCA uses **X**palabra (asteriscos que cortan palabras). EstÃ¡ PROHIBIDO.
+- USA TEXTO PLANO. NUNCA uses **X**palabra (asteriscos que cortan palabras). EstÃÂ¡ PROHIBIDO.
 - Negrita en WhatsApp: *texto* (un asterisco cada lado). Ejemplo: *Hola* no **Hola**
-- SIEMPRE ofrece opciones numeradas para que el usuario responda con un nÃºmero.
+- SIEMPRE ofrece opciones numeradas para que el usuario responda con un nÃÂºmero.
 - Ejemplo correcto de opciones:
-  Â¿QuÃ© necesitas hoy?
-  1. OrientaciÃ³n laboral
+  ÃÂ¿QuÃÂ© necesitas hoy?
+  1. OrientaciÃÂ³n laboral
   2. Crear mi perfil
   3. Hacer mi CV
   4. Buscar empleo
 - Usa pocos asteriscos. Solo para destacar algo importante.
-- Las URLs deben escribirse completas como texto plano (son clickeables automÃ¡ticamente en WhatsApp).
+- Las URLs deben escrib\ÙHÛÛ\]\ÈÛÛ[È^È[È
+ÛÛÛXÚÙXX\È]]Ûpàð¨]XØ[Y[H[Ú]Ð\
+KQSSQH
+ÝX[È[ÝZY[\ØÜXHÜ[Y\H^ÈXÙHÛHN°à° RÛHHÛÞHHÜY[YÜØHXÜ[HH]YÜXHXÜ[[Û\Ú]HH[XÚpàð¬ÛÓÑSYYÈ^]Y\HÛÛKÜY[XÚpàð¬ÛXÜ[
+[]\Ý\Ë\XÚÜË^HKMJBÜX\H\[XÜ[Ë\X\HÕ\ØØ\Ù\\ÈH[\[Âðà°¯ÐÛÛ]pàð¨\]ZpàðªY\\ÈÛÛY[\È\ÜÛHÛÛ[°àð®Y\Ëpàð¢UÑÈÕTÛÛ^Î\ØÜXH[ÛÛ^Ë\XN^XØH[\ØY°àð«[ËXØÚpàð¬ÛÝY[HÈ]YHXÚ\ÝK\Ý[YÎY[Ú[ÛH[ÙÜËpàð¤ÑSÔÎKÔQSPÒpàð¤ÓPÔS[]\Ý\Ëpàðª]ÙÈÕT^HKMKÑSQTËÓRSZ\Ý\È^ÛX\ËTSPÔSXÛÜ[HÛXK[0àðªYÛË[XZ[Ú]YYYXØXÚpàð¬Û^\Y[ÚXKX[YY\Ë0àð¨\XH[\°àðª\Ë\ÜÛX[YY
+[ÈHH^ÚY[\HÛÛÜÚ[Û\È[Y\Y\ÊKËÕ
+ÜX]ÈÓÑSN]ÜÈ\ÛÛ[\Ë\[^\Y[ÚXKÜXXÚpàð¬ÛÝ\ÛÜËX[YY\ËÔSTÈHSTSÈ
+[\ÝHÜ[NHÎËÜÛÙZXKÛÈ
+]YÜXHXÜ[[Û\Ú]HÓÑSHY[Ú[Û\ÒQSTH[Y\ÊBHÎËÝÝÝËKÛÈ
+ÛØHXÚ[Û[H[\[ÈHY[Ú[Û\ÙYÝ[ÊBHÝÝË[Û^Y[YKÛÛBHÝÝË[\[ÜÜXXÛÜËÛHÝÝËÛÛ\]XZËÛ[YØHÚY[\H\ÈTÈÛÛ\]\ÈÛÛ[È^È[ËÔTÈÑSPSSTÈH^HKMH
 
-BIENVENIDA (cuando alguien escribe por primera vez o dice "hola"):
-Â¡Hola! Soy tu orientador/a laboral de la Plataforma Laboral Inclusiva de FundaciÃ³n SOFAN.
+Ü\ÊNH\ÙHX[pàð¨^[[È
+Ü\ÈÙ[X[[\È
+QÑSHRÔJBH\ÙHX[Ù\°àð¨Hpàð¨^[[È
+Ü\ÈÙ[X[[\ÂH[ÜXHÚY[\H]YH[0àð«[Z]HXÝX[\È
+Ü\ÈÙ[X[[\ËÑTQPÐQÈHTÐÐTPÒQQH^HKMNH[Ù\YXØYÈPH\Ý\QÑSH\HXØÙY\HÝ\ÜÈH[Û\Úpàð¬ÛXÜ[H[Ù\YXØYÈSÒQÈÈX[]H\HÜÈÝ\ÜÈHH^HKMKHÚH[\ÝX\[ÈY[HÙ\YXØYÈ[ÚYÎ[XØ\]YHXH[Ý\È[ÓÓTSÈÑSQTÈSTÈHÜÝ[\HÝ\ÜÈHH^HKMKHÜÚ[Û\ÈH\Ù[\K[ÛÈÙ\YXØYÈYÙ[BZHÙ\YXØYÈ\Ý0àð¨H[ÚYÈ
+XÙ\Ú]È[Ý\ÊBË\ÝÞH[ØÙ\ÛÈHØ[\Â
+È[ÛÈÙ\YXØYÂ
+KYY\ÈÈXÚ\TSRQSTÎ\ØHØ[\Ü\[Ý\ÝX\[È[[XÚ[ËÝX\\Ü\[Ý\ÝX\[ÈÝX[È[Ø\ÈÛXJÌ]ÜËYÚ\Ý\ØÛÛ\ØXÚ[Û\È\ÜY\Ý\È[\Ü[\ËÚH[Y[ØZH\È\ÛË]\ØH]YHÛÛ[X\°àð¨\È[[ÚYÝZY[HY[ØZKSÐH\Ù\È[ÝXZH\Ú\Ý[ÚX[\ÝK]HHH\ÛÛHÛÛ[ÈÙ\Ú[Û[Ø\^\Þ[ÈY[X\ÝÚ]Ø\
+[YÛÎÝY[ØZNÝN[°àð«XHY[ØZHXHY]HÚ]Ð\ÛÝYTKÚÙ[HÜËÙ][QUWÐPÐÑTÔ×ÕÒÑSBÛWÚYHÜËÙ][QUWÔÓWÓSPTÒQB\HÎËÙÜ\XÙXÛÚËÛÛKÝNKÞÜÛWÚYKÛY\ÜØYÙ\ÈY[ØZWÛ[\[ÈH[\X\ÛX\ÙÝÛY[ØZJB\\ÈHÛY[ØZWÛ[\[ÖÚNJÌMLHÜH[[ÙJ[Y[ØZWÛ[\[ÊKML
+WB\Þ[ÈÚ]\Þ[ÐÛY[
 
-Puedo ayudarte con:
-1. OrientaciÃ³n laboral (entrevistas, derechos, Ley 21.015)
-2. Crear tu perfil laboral
-3. Armar tu CV
-4. Buscar ofertas de empleo
+H\ÈÛY[Ü\H[\\ÎH]ØZ]ÛY[ÜÝ
+\XY\Ï^È]]Ü^][ÛX\\ÝÚÙ[HÛÛ[U\H\XØ][ÛÚÛÛKÛÛ^ÈY\ÜØYÚ[×ÜÙXÝÚ]Ø\È[YÛË\H^^ÈÙH\__JBYÝ]\×ØÛÙHOH[
+ÔÑSTÔHÜÝ]\×ØÛÙ_NÜ^Î_HBYØ[\Ü\ÜY\ÝWØÛ]YJ[YÛÎÝY[ØZNÝHOÝY[YÛÈÝ[ÛÛ\ØXÚ[Û\ÎÛÛ\ØXÚ[Û\ÖÝ[YÛ×HH×BÛÛ\ØXÚ[Û\ÖÝ[YÛ×K\[
+ÈÛH\Ù\ÛÛ[Y[ØZ_JB\ÝÜX[HÛÛ\ØXÚ[Û\ÖÝ[YÛ×VËLBÜÈ[[ÙJ
+JN\ÜHÛ]YKY\ÜØYÙ\ËÜX]J[Ù[HÛ]YK\ÛÛ]MLL
+LMX^ÝÚÙ[ÏLLÞ\Ý[OTÖTÕSWÔÓTÛÛÏUÓÓËY\ÜØYÙ\ÏZ\ÝÜX[
+BY\ÜÝÜÜX\ÛÛOHÛÛÝ\ÙH\ÝÜX[\[
+ÈÛH\ÜÚ\Ý[ÛÛ[\ÜÛÛ[JB\Ý[YÜÈH×BÜÜ]YH[\ÜÛÛ[YÜ]YK\HOHÛÛÝ\ÙH\Ý[YÈHZXÝ]\Ú\[ZY[JÜ]YK[YKÜ]YK[]
+B\Ý[YÜË\[
+È\HÛÛÜ\Ý[ÛÛÝ\ÙWÚYÜ]YKYÛÛ[ÛÛ[\Ê\Ý[YË[Ý\WØ\ØÚZOQ[ÙJ_JB\ÝÜX[\[
+ÈÛH\Ù\ÛÛ[\Ý[YÜßJB[ÙN^ÈHÚ[^Ü[\ÜÛÛ[Y\Ø]^JB\ÝÜX[\[
+ÈÛH\ÜÚ\Ý[ÛÛ[^ßJBÛÛ\ØXÚ[Û\ÖÝ[YÛ×HH\ÝÜX[]\^ËÝ\
 
-Â¿Con quÃ© quieres comenzar? Responde con el nÃºmero.
+B]\ÈÚY[ËXÈ[\ÜÜ]Ü\ØÜXHHY]Ë\Ù]
+ÝÙXÛÚÈB\Þ[ÈY\YXØ\ÝÙXÛÚÊ\]Y\Ý\]Y\Ý
+N\[\ÈHXÝ
+\]Y\Ý]Y\WÜ\[\ÊBY
+\[\ËÙ]
+X[ÙHHOHÝXØÜXH[\[\ËÙ]
+X\YWÝÚÙ[HOHQUWÕTQWÕÒÑSN]\Z[^\ÜÛÙJ\[\ËÙ]
+XÚ[[ÙHJB]\\ÜÛÙJÝ]\×ØÛÙOMÊB\ÜÝ
+ÝÙXÛÚÈB\Þ[ÈYXÚX\ÛY[ØZJ\]Y\Ý\]Y\Ý
+NNÙHH]ØZ]\]Y\ÝÛÛ
+B[HHÙKÙ]
+[HÞßWJVÌBÚ[Ù\ÈH[KÙ]
+Ú[Ù\ÈÞßWJVÌB[YHHÚ[Ù\ËÙ]
+[YHßJBY\ÜØYÙ\ÈH[YKÙ]
+Y\ÜØYÙ\È×JBYÝY\ÜØYÙ\Î]\ÈÝ]\ÈÚÈB\ÙÈHY\ÜØYÙ\ÖÌB[YÛÈH\ÙËÙ]
+ÛHB\ÈH\ÙËÙ]
+\HBY\ÈOH^^ÈH\ÙËÙ]
+^ßJKÙ]
+ÙHB[Y\ÈOH]Y[ÈYYXWÚYH\ÙËÙ]
+]Y[ÈßJKÙ]
+YB[
+ÐUQS×HÝ[YÛßNYYXWÚY^ÛYYXWÚYHB]ØZ][X\ÝÚ]Ø\
+[YÛËXÚXHH]Y[ËÜZÜHÛÛÈØÙ\ÛÈ^Ë\ØÜXHHY[ØZHHH\ÜÛÈH[YYX]ËB]\ÈÝ]\ÈÚÈB[Y\ÈOH[\XÝ]H^ÈH
+\ÙËÙ]
+[\XÝ]HßJBÙ]
+]ÛÜ\HßJKÙ]
+]HJB[ÙN]ØZ][X\ÝÚ]Ø\
+[YÛËXÚXHHY[ØZKÜZÜHÛÛÈØÙ\ÛÈ^Ë\ØÜXHÈ]YHXÙ\Ú]\ÈHH\ÜÛËB]\ÈÝ]\ÈÚÈBYÝ^Î]\ÈÝ]\ÈÚÈB[
+ÓTÑ×HÝ[YÛßNÝ^ÖÎ_HB\ÜY\ÝHHØ[\Ü\ÜY\ÝWØÛ]YJ[YÛË^ÊB]ØZ][X\ÝÚ]Ø\
+[YÛË\ÜY\ÝJB^Ù\^Ù\[Û\ÈN[
+ÑTÔHÙ_HB]\ÈÝ]\ÈÚÈB\Ù]
+ÚX[B\Þ[ÈYX[
 
-MÃTODO STAR (sin asteriscos cortando palabras):
-SituaciÃ³n: describe el contexto...
-Tarea: explica el desafÃ­o...
-AcciÃ³n: cuenta lo que hiciste...
-Resultado: menciona el logro...
+N]\ÈÝ]\ÈÚÈÙ\XÙHÓÑSÚ]ÝXÜ[È\ÝX\[Ü×ØXÝ]ÜÈ[ÛÛ\ØXÚ[Û\Ê_B\Ù]
+ÈB\Þ[ÈYÛÝ
 
-MÃDULOS:
-1. ORIENTACIÃN LABORAL: entrevistas, mÃ©todo STAR, Ley 21.015, SENADIS, OMIL, ajustes razonables.
-2. PERFIL LABORAL: recopila nombre, telÃ©fono, email, ciudad, educaciÃ³n, experiencia, habilidades, Ã¡rea interÃ©s, disponibilidad (uno a la vez, siempre con opciones numeradas).
-3. CV (formato SOFAN 2026): datos personales, perfil, experiencia, formaciÃ³n, cursos, habilidades.
-4. PORTALES DE EMPLEO (en este orden):
-   - https://sof-ia.cl/ (Plataforma Laboral Inclusiva SOFAN - mencionar SIEMPRE primero)
-   - https://www.bne.cl/ (Bolsa Nacional de Empleo - mencionar segundo)
-   - www.incluyeme.com
-   - www.empleospublicos.cl
-   - www.computrabajo.cl
-   Entrega siempre las URLs completas como texto plano.
-
-HORAS SEMANALES - Ley 21.561 (40 horas):
-- Desde abril 2026: mÃ¡ximo 42 horas semanales (VIGENTE AHORA)
-- Desde abril 2028: serÃ¡ mÃ¡ximo 40 horas semanales
-- Informa siempre que el lÃ­mite actual es 42 horas semanales.
-
-CERTIFICADO DE DISCAPACIDAD - Ley 21.015:
-- El certificado DEBE estar VIGENTE para acceder a cupos de inclusiÃ³n laboral.
-- Un certificado VENCIDO NO habilita para los cupos de la Ley 21.015.
-- Si el usuario tiene certificado vencido: indicar que debe renovarlo en COMPIN o SENADIS ANTES de postular a cupos de la Ley 21.015.
-- Opciones a presentar:
-  1. Tengo certificado vigente
-  2. Mi certificado estÃ¡ vencido (necesito renovarlo)
-  3. Estoy en proceso de obtenerlo
-  4. No tengo certificado
-  5. Prefiero no decir
-
-HERRAMIENTAS: usa obtener_perfil_usuario al inicio, guardar_perfil_usuario cuando tengas nombre+2 datos, registrar_conversacion tras respuestas importantes.
-Si el mensaje es largo, avisa que continuarÃ¡s en el siguiente mensaje.
-NUNCA uses lenguaje asistencialista. Trata a la persona como profesional capaz."""
-
-async def enviar_whatsapp(telefono: str, mensaje: str):
-    """EnvÃ­a mensaje via Meta WhatsApp Cloud API."""
-    token = os.getenv("META_ACCESS_TOKEN")
-    phone_id = os.getenv("META_PHONE_NUMBER_ID")
-    url = f"https://graph.facebook.com/v19.0/{phone_id}/messages"
-    mensaje_limpio = limpiar_markdown(mensaje)
-    partes = [mensaje_limpio[i:i+1500] for i in range(0, len(mensaje_limpio), 1500)]
-    async with httpx.AsyncClient() as client:
-        for parte in partes:
-            r = await client.post(url,
-                headers={"Authorization": f"Bearer {token}",
-                         "Content-Type": "application/json"},
-                json={"messaging_product": "whatsapp", "to": telefono,
-                      "type": "text", "text": {"body": parte}})
-            if r.status_code != 200:
-                print(f"[SEND ERROR] {r.status_code}: {r.text[:200]}")
-
-def obtener_respuesta_claude(telefono: str, mensaje: str) -> str:
-    if telefono not in conversaciones:
-        conversaciones[telefono] = []
-    conversaciones[telefono].append({"role": "user", "content": mensaje})
-    historial = conversaciones[telefono][-20:]
-
-    for _ in range(5):
-        resp = claude.messages.create(
-            model="claude-sonnet-4-20250514", max_tokens=1000,
-            system=SYSTEM_PROMPT, tools=TOOLS, messages=historial)
-
-        if resp.stop_reason == "tool_use":
-            historial.append({"role": "assistant", "content": resp.content})
-            resultados = []
-            for bloque in resp.content:
-                if bloque.type == "tool_use":
-                    resultado = ejecutar_herramienta(bloque.name, bloque.input)
-                    resultados.append({"type": "tool_result", "tool_use_id": bloque.id,
-                                       "content": json.dumps(resultado, ensure_ascii=False)})
-            historial.append({"role": "user", "content": resultados})
-        else:
-            texto = "".join(b.text for b in resp.content if hasattr(b, "text"))
-            historial.append({"role": "assistant", "content": texto})
-            conversaciones[telefono] = historial
-            return texto.strip()
-
-    return "Lo siento, hubo un error. Por favor escribe de nuevo. ð"
-
-# ââ Endpoints ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-@app.get("/webhook")
-async def verificar_webhook(request: Request):
-    params = dict(request.query_params)
-    if (params.get("hub.mode") == "subscribe" and
-            params.get("hub.verify_token") == META_VERIFY_TOKEN):
-        return PlainTextResponse(params.get("hub.challenge", ""))
-    return Response(status_code=403)
-
-@app.post("/webhook")
-async def recibir_mensaje(request: Request):
-    try:
-        body = await request.json()
-        entry = body.get("entry", [{}])[0]
-        changes = entry.get("changes", [{}])[0]
-        value = changes.get("value", {})
-        messages = value.get("messages", [])
-
-        if not messages:
-            return {"status": "ok"}
-
-        msg = messages[0]
-        telefono = msg.get("from", "")
-        tipo = msg.get("type", "")
-
-        if tipo == "text":
-            texto = msg.get("text", {}).get("body", "")
-        elif tipo == "audio":
-            media_id = msg.get("audio", {}).get("id", "")
-            print(f"[AUDIO] {telefono}: media_id={media_id}")
-            await enviar_whatsapp(telefono,
-                "RecibÃ­ tu audio ðï¸ Por ahora solo proceso texto.\n"
-                "Â¿Puedes escribirme tu mensaje? Te respondo de inmediato.")
-            return {"status": "ok"}
-        elif tipo == "interactive":
-            texto = (msg.get("interactive", {})
-                     .get("button_reply", {}).get("title", ""))
-        else:
-            await enviar_whatsapp(telefono,
-                "RecibÃ­ tu mensaje. Por ahora solo proceso texto.\n"
-                "Â¿Puedes escribirme lo que necesitas?")
-            return {"status": "ok"}
-
-        if not texto:
-            return {"status": "ok"}
-
-        print(f"[MSG] {telefono}: {texto[:80]}")
-        respuesta = obtener_respuesta_claude(telefono, texto)
-        await enviar_whatsapp(telefono, respuesta)
-
-    except Exception as e:
-        print(f"[ERROR] {e}")
-
-    return {"status": "ok"}
-
-@app.get("/health")
-async def health():
-    return {"status": "ok", "service": "SOFAN Chatbot Laboral v3",
-            "usuarios_activos": len(conversaciones)}
-
-@app.get("/")
-async def root():
-    return {"mensaje": "SOFAN Chatbot Laboral v3 - Meta Cloud API", "health": "/health"}
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("app:app", host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
+N]\ÈY[ØZHÓÑSÚ]ÝXÜ[ÈHY]HÛÝYTHX[ÚX[BY×Û[YW×ÈOH×ÛXZ[×È[\Ü]XÛÜ]XÛÜ[\\ÜÝHÜZ[
+ÜËÙ][Ô
+JJB
